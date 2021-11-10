@@ -1,0 +1,451 @@
+<html>
+<head>
+
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/selection-js/lib/selection.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.0/chart.min.js"> </script>
+
+<script src="/Users/benjamincowen/Desktop/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="menu.css" />
+
+
+
+<style>
+	.selection-area {
+	    background: rgba(46, 115, 252, 0.11);
+	    border: 2px solid rgba(98, 155, 255, 0.81);
+	    border-radius: 0.01em;
+	}
+    .content {
+        transition: all .3s ease-in-out;
+
+        visibility: visible;
+        height: 90;
+        color:black;
+
+    }
+    
+    
+    .content-hidden {
+        transition: all .3s ease-out;
+
+        visibility: hidden;
+        opacity: 0;
+        height: 0;
+                color:black;
+
+    }
+
+
+
+    
+
+
+</style>
+</head>
+<body id="body" style="margin:50px">
+
+    <div class="menu-wrap">
+      <input type="checkbox" class="toggler" />
+      <div class="hamburger"><div></div></div>
+      <div class="menu">
+
+        <div>
+        <img src="img_girl.jpg" alt="Logo" width="100" height="100">
+
+          <ul>
+            <li><a href="#">File</a></li>
+            <li class="collapsible">Cursor</li>
+            <div class="content-hidden">
+                    <p> <li onClick="setCursor('default')">Selector</li></p>
+                    <p> <li onClick="setCursor('all-scroll')">Pan</li></p>
+                    <p> <li onClick="setCursor('crosshair')">Zoom</li></p>
+            </div>
+            <li><a href="#">Script</a></li>
+            <li><a href="#">Com</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    </nav>
+
+
+	<canvas id="myChart" width="40" height="40"></canvas>
+
+
+
+
+
+
+
+</body>
+<script>
+
+
+
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    console.log("HE");
+    var content = this.nextElementSibling;
+    //content.classList.toggle('content');
+    content.classList.toggle('content');
+    content.classList.toggle('content-hidden');
+
+  });
+}
+
+
+
+
+
+var cursor = null;
+
+function setCursor(c) {
+    cursor =c;
+    document.body.style.cursor = cursor;
+
+}
+
+
+
+var ctx = document.getElementById('myChart').getContext('2d');
+
+
+var peak_best_fit = [6.791037536364996, 6.810045579037288, 6.82905362170958, 6.848061664381872, 6.867069707054164, 6.886077749726456, 6.905085792398748, 6.92409383507104, 6.943101877743332, 6.962109920415624, 6.981117963087915, 7.000126005760208, 7.0191340484325, 7.038142091104792, 7.057150133777084, 7.0761581764493755, 7.095166219121667, 7.114174261793959, 7.133182304466252, 7.152190347138544, 7.171198389810836, 7.190206432483127, 7.209214475155419, 7.228222517827711, 7.247230560500004, 7.266238603172296, 7.2852466458445875, 7.304254688516879, 7.323262731189171, 7.342270773861463, 7.361278816533755, 7.380286859206047, 7.399294901878339, 7.418302944550631, 7.437310987222923, 7.456319029895215, 7.475327072567507, 7.494335115239799, 7.513343157912091, 7.532351200584383, 7.551359243256675, 7.570367285928967, 7.589375328601259, 7.6083833712735505, 7.627391413945842, 7.646399456618134, 7.665407499290427, 7.684415541962719, 7.7034235846350105, 7.722431627307302, 7.741439669979594, 7.760447712651886];
+
+
+var data_values = [6.944999933242798, 6.917500019073486, 6.8465001583099365, 6.875, 6.912599802017212, 6.89205002784729, 6.8859498500823975, 6.867549896240234, 6.872550010681152, 6.924949884414673, 6.930000066757202, 6.920000076293945, 6.926599979400635, 7.039999961853027, 7.112500190734863, 7.107500076293945, 7.049999952316284, 6.990000009536743, 7.0, 7.028249979019165, 7.069050073623657, 7.085000038146973, 7.077500104904175, 7.077499866485596, 7.05430006980896, 7.025000095367432, 7.094249963760376, 7.144949913024902, 7.282449960708618, 7.3454999923706055, 7.375, 7.4245500564575195, 7.370450019836426, 7.3795998096466064, 7.453999996185303, 7.4674999713897705, 7.457499980926514, 7.424950122833252, 7.365000009536743, 7.329999923706055];
+
+
+var time_labels = ['09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '13:00:00', '13:30:00', '14:00:00', '14:30:00', '15:00:00', '15:30:00', '16:00:00'];
+
+
+var background_colors = [];
+var border_colors = [];
+var border_widths = [];
+data_values.forEach( _ => {
+	background_colors.push("black")
+	border_colors.push("black");
+	border_widths.push(1);
+});
+
+data_values.forEach( _ => border_colors.push("black"));
+
+
+var valley_indexes = [11, 7, 32, 25, 2, 17];
+valley_indexes.forEach(i =>  background_colors[i] = "red");
+
+
+
+var peak_indexes = [10, 4, 31, 21, 14, 35];
+peak_indexes.forEach(i =>  background_colors[i] = "blue");
+
+
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: time_labels,
+        datasets: [
+        {
+            label: 'CLOV Price Action',
+            data: data_values,
+            pointBackgroundColor: background_colors,     
+            backgroundColor: "black",
+       //     'rgba(255, 99, 132, 0.2)',
+            //     'rgba(54, 162, 235, 0.2)',
+            //     'rgba(255, 206, 86, 0.2)',
+            //     'rgba(75, 192, 192, 0.2)',
+            //     'rgba(153, 102, 255, 0.2)',
+            //     'rgba(255, 159, 64, 0.2)'
+            // ],
+            // borderColor: [
+            //     'rgba(255, 99, 132, 1)',
+            //     'rgba(54, 162, 235, 1)',
+            //     'rgba(255, 206, 86, 1)',
+            //     'rgba(75, 192, 192, 1)',
+            //     'rgba(153, 102, 255, 1)',
+            //     'rgba(255, 159, 64, 1)'
+            // ],
+            pointBorderColor: border_colors,
+            borderColor: "black",
+            borderWidth: 1,
+            pointBorderWidth: border_widths,
+
+
+        },
+        {
+        	label: 'Peak Aprox.',
+        	borderColor: ['blue'],
+        	data: peak_best_fit,
+        	pointRadius: 0,
+			pointHoverRadius: 0,
+			borderWidth: 1
+
+        }
+
+        ]
+    },
+    options: {
+        transitions: {
+            pan: {
+                animation: {
+                    duration: 10000,
+                    easing: 'easeOutCubic'
+                }
+            }
+    },
+    	plugins: {
+			tooltip: { enabled: false },
+
+            zoom: {
+
+                pan: {
+                    enabled: true,
+                    modifierkey: 'shift',
+                    onPanStart: (c,e,p) => {
+                        return cursor == "all-scroll";
+
+
+                    },
+                    mode: "xy",
+                },
+                zoom: {
+                    wheel: {
+                    enabled: true,
+                    sensitivity: 5,
+                    },
+
+                    onZoomStart: (c,e,p) => {
+                        return cursor == "crosshair";
+
+
+                    },
+                    pinch: {
+                        enabled: false,
+                    },
+                    drag: {
+                        enabled: true,
+                    },
+                    mode: 'x',
+                }
+            }
+		},
+    	events: ['mousedown','mouseup'],
+        scales: {
+            	y: { beginAtZero: false }
+        },
+            pan: {
+      enabled: true,
+      mode: 'x',     
+    },
+    zoom: {
+      enabled: true,         
+      mode: 'x',     
+    },
+    responsive: true,
+        
+        onClick: (evt, item) => {
+        	helper(evt,item);
+        },
+
+    }
+});
+
+
+
+function helper(evt,item) {
+
+	if (item.length > 0 && item[0]['datasetIndex'] == 0) {
+				var index = item[0]['element']['parsed']['x'];
+				if (myChart.data.datasets[0].pointBorderWidth[index] == 3) {
+					myChart.data.datasets[0].pointBorderWidth[index] = 1;
+					myChart.data.datasets[0].pointBorderColor[index] = "black";
+
+				}
+				else {
+					myChart.data.datasets[0].pointBorderWidth[index] = 3;
+					myChart.data.datasets[0].pointBorderColor[index] = "gold";
+
+				}
+    myChart.update();
+
+
+
+// var node = document.createElement("div");   
+// node.classList.add('circleBase');  
+// node.classList.add('type1');    
+
+// node.style.position= 'fixed';
+// node.style.top= item[0].element.y + myChart.canvas.offsetTop -  Math.sqrt(8);
+// node.style.left = item[0].element.x + myChart.canvas.offsetLeft - Math.sqrt(8);
+
+
+//          // Create a <li> node
+// document.getElementById("body").appendChild(node);
+
+    }
+
+}
+
+
+
+
+
+const selection = new SelectionArea({
+
+    // document object - if you want to use it within an embed document (or iframe).
+    document: window.document,
+
+    // Class for the selection-area element.
+    class: 'selection-area',
+
+    // Query selector or dom-node to set up container for the selection-area element.
+    container: 'body',
+
+    // Query selectors for elements which can be selected.
+    selectables: [],
+
+    // Query selectors for elements from where a selection can be started from.
+    startareas: ['canvas'],
+
+    // Query selectors for elements which will be used as boundaries for the selection.
+    boundaries: ['html'],
+
+    // px, how many pixels the point should move before starting the selection (combined distance).
+    // Or specifiy the threshold for each axis by passing an object like {x: <number>, y: <number>}.
+    startThreshold: 1,
+
+    // Enable / disable touch support
+    allowTouch: true,
+
+    // On which point an element should be selected.
+    // Available modes are cover (cover the entire element), center (touch the center) or
+    // the default mode is touch (just touching it).
+    intersect: 'touch',
+
+    // Specifies what should be done if already selected elements get selected again.
+    //   invert: Invert selection for elements which were already selected
+    //   keep: Make stored elements (by keepSelectio()) 'fix'
+    //   drop: Remove stored elements after they have been touched
+    overlap: 'invert',
+
+    // Configuration in case a selectable gets just clicked.
+    singleTap: {
+
+        // Enable single-click selection (Also disables range-selection via shift + ctrl).
+        allow: true,
+
+        // 'native' (element was mouse-event target) or 'touch' (element visually touched).
+        intersect: 'native'
+    },
+
+    // Scroll configuration.
+    scrolling: {
+
+        // On scrollable areas the number on px per frame is devided by this amount.
+        // Default is 10 to provide a enjoyable scroll experience.
+        speedDivider: 10,
+
+        // Browsers handle mouse-wheel events differently, this number will be used as 
+        // numerator to calculate the mount of px while scrolling manually: manualScrollSpeed / scrollSpeedDivider.
+        manualSpeed: 750
+    }
+});
+
+
+
+
+
+var xStart;
+var yStart;
+
+
+selection.on('beforestart', evt => { 
+    return cursor == "default";
+});
+
+selection.on("start",evt => {
+	xStart = evt.event.pageX;
+	yStart = evt.event.pageY;
+});
+selection.on("stop",evt => {
+	activateObjectsInRange(xStart,yStart, evt.event.pageX, evt.event.pageY);
+	myChart.update();
+});
+
+
+selection.on("move",evt => {
+    HoverObjectsInRange(xStart,yStart, evt.event.pageX, evt.event.pageY);
+    myChart.update();
+});
+
+
+
+
+
+function activateObjectsInRange(xStart, yStart, xEnd, yEnd) {
+	console.log(xStart,xEnd,yStart,yEnd);
+
+    myChart.getDatasetMeta(0).data.forEach(point =>  {
+		var i = point.$context.index;
+		var offsetPositionX = point.x + myChart.canvas.offsetLeft - Math.sqrt(2);
+		var offsetPositionY = point.y + myChart.canvas.offsetTop - Math.sqrt(2);
+
+
+;
+		if ((Math.min(xStart,xEnd) - 1 <= offsetPositionX) && (offsetPositionX <= Math.max(xStart,xEnd) + 1) && (Math.min(yStart,yEnd) - 1 <= offsetPositionY) && (offsetPositionY <= Math.max(yStart,yEnd) + 1)) {
+			myChart.data.datasets[0].pointBorderWidth[i] = 3;
+			myChart.data.datasets[0].pointBorderColor[i] = "gold";
+		}
+	}
+
+
+	 );
+
+
+}
+
+
+function HoverObjectsInRange(xStart, yStart, xEnd, yEnd) {
+
+    myChart.getDatasetMeta(0).data.forEach(point =>  {
+        var i = point.$context.index;
+        var offsetPositionX = point.x + myChart.canvas.offsetLeft - Math.sqrt(2);
+        var offsetPositionY = point.y + myChart.canvas.offsetTop - Math.sqrt(2);
+
+
+
+        if (myChart.data.datasets[0].pointBorderWidth[i] != 3 && (Math.min(xStart,xEnd) - 1 <= offsetPositionX) && (offsetPositionX <= Math.max(xStart,xEnd) + 1) && (Math.min(yStart,yEnd) - 1 <= offsetPositionY) && (offsetPositionY <= Math.max(yStart,yEnd) + 1)) {
+            myChart.data.datasets[0].pointBorderWidth[i] = 1.5;
+            myChart.data.datasets[0].pointBorderColor[i] = "gold";
+        }
+        else {
+            if (myChart.data.datasets[0].pointBorderWidth[i] == 1.5) {
+                myChart.data.datasets[0].pointBorderWidth[i] = 1;
+                myChart.data.datasets[0].pointBorderColor[i] = "black";
+            }
+        }
+    }
+
+
+     );
+
+
+}
+
+
+
+
+</script>
+
+</html>
